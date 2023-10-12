@@ -1,9 +1,14 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 const userSchema = new mongoose.Schema({
-  name: String,
+  userName: String,
   password: String,
   email: String,
+  isVerifiedAccount: {
+    type: Boolean,
+    default: false,
+  },
+  emailVerificationLink:String,
 });
 userSchema.methods.comparePassword = async function(userPassword){
   const isMatch = await bcrypt.compare(userPassword, this.password);

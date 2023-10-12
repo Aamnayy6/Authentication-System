@@ -2,8 +2,29 @@ import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import nodemailer from "nodemailer";
 dotenv.config();
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    type: 'OAuth2',
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+    clientId: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    refreshToken: process.env.REFRESH_TOKEN
+  }
+});
+async function mailHandler(mailObject){
 
+const mailOptions = {
+  from: process.env.EMAIL_USER,
+  to: mailObject.recipient,
+  subject: mailObject.subject,
+  text: mailObject.body,
+};
+ await transporter.sendMail(mailOptions);
+}
 const cookieOptions = {
     expires: new Date(
       Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
@@ -21,7 +42,13 @@ export const registerUser = async (req, res) => {
     });
     await user.save();
     const jwtoken = createjwtoken({email:user.email, userName: user.userName});
-    res.cookie('jwt', jwtoken, cookieOptions);
+    const mailOptions={
+      recipient:user.email,
+      subject:'Verify Email',
+      body: 'You have signed up successfully. To verify your email click the link below'
+    };
+   await mailHandler(mailOptions);
+    res.cookie('jwt', {jwtoken, user}, cookieOptions);
     res.send({status:"success", jwtoken ,data: {
         user
     }});
@@ -50,7 +77,7 @@ export const loginUser = async (req, res) => {
  
     const jwtoken = createjwtoken({ email: user.email, userName: user.userName});
    
-    res.cookie("jwt", jwtoken, cookieOptions);
+    res.cookie("jwt", {jwtoken, user}, cookieOptions);
     res.send({
       status: "success",
       jwtoken,
@@ -63,4 +90,15 @@ export const loginUser = async (req, res) => {
     res.status(500).send(err);
     return;
   }
+};
+
+export const logout = async (req, res) =>{
+  try{
+  res.clearCookie("jwt");
+  res.send({status:"success"});
+
+}catch(err){
+  res.status(500).send(err);
+}
+
 };
