@@ -6,4 +6,5 @@ router.post("/register", authHandlers.registerUser);
 //router.post("/register", authMiddleware.checkUniqueEmail,authHandlers.registerUser);
 router.post("/login", authMiddleware.checkEmailExists,authHandlers.loginUser);
 router.get("/logout", authMiddleware.checkUserLoggedIn, authHandlers.logout);
+router.get("/verify-email", authHandlers.verifyEmail);
 export default router;

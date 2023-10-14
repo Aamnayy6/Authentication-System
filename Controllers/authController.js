@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
+import crypto from "node:crypto";
 dotenv.config();
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -21,7 +22,7 @@ const mailOptions = {
   from: process.env.EMAIL_USER,
   to: mailObject.recipient,
   subject: mailObject.subject,
-  text: mailObject.body,
+  html: mailObject.body,
 };
  await transporter.sendMail(mailOptions);
 }
@@ -40,12 +41,16 @@ export const registerUser = async (req, res) => {
       userName: userName,
       password: bcrypt.hashSync(password, 10),
     });
+    const emailVerificationToken = user.generateVerificationLink();
     await user.save();
     const jwtoken = createjwtoken({email:user.email, userName: user.userName});
     const mailOptions={
       recipient:user.email,
       subject:'Verify Email',
-      body: 'You have signed up successfully. To verify your email click the link below'
+      body: `You have signed up successfully.<br>To verify your email click the link below: <br>
+
+      <a href="http://localhost:3000/auth/verify-email?token=${emailVerificationToken}">Verify Email </a>
+      `
     };
    await mailHandler(mailOptions);
     res.cookie('jwt', {jwtoken, user}, cookieOptions);
@@ -64,6 +69,22 @@ function createjwtoken(payload){
         expiresIn: process.env.JWT_EXPIRES_IN,
       });
 }
+
+export const verifyEmail= async(req,res)=>{
+  try{
+    const token = req.query.token;
+    const tokenHash =  crypto.createHash('sha256').update(token).digest('hex');
+    const user = await User.findOne({emailVerificationLink:tokenHash});
+    user.emailVerificationToken=undefined;
+    user.isVerifiedAccount = true;
+    await user.save();
+
+    res.render("accountVerified");
+  }catch(err){
+    console.log(err);
+    res.status(500).send(err);
+  }
+};
 
 export const loginUser = async (req, res) => {
   try {
