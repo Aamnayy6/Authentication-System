@@ -35,6 +35,7 @@ const cookieOptions = {
 
 export const registerUser = async (req, res) => {
   try {
+    
     const { email, userName, password } = req.body;
     const user = new User({
       email: email,

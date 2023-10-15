@@ -12,8 +12,10 @@ router.get("/myAccount", verifyUserMiddleware.checkUserLoggedIn , (req, res)=>{
    res.render("accountInformation", {user:user});
 });
 
-router.get("/account-verified", (req, res)=>{
-    res.render("accountVerified");
-});
+
+
+router.get("/notes", [verifyUserMiddleware.checkUserLoggedIn], (req, res)=>{
+    res.render("notes");
+})
 
 export default router;

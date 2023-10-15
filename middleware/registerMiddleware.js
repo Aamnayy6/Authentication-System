@@ -29,7 +29,7 @@ export const checkEmailExists = async(req, res, next) =>{
 
 export const checkUserLoggedIn =  function(req, res, next){
   if(!req.cookies.jwt){
-    return res.status(401).send("Unauthorized");
+    return res.redirect("/UnauthorizedAccess.html");
   }
   const {jwtoken, user} = req.cookies.jwt;
  
@@ -38,10 +38,7 @@ export const checkUserLoggedIn =  function(req, res, next){
           next();
        }
        else{
-       
-          return res.status(401).send("Unauthorized");
-       
+         // return res.status(401).send("Unauthorized");
+        return res.redirect("/UnauthorizedAccess.html");
        }
-  
-
 };
