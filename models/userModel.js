@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
   emailVerificationLink:String,
+  passwordResetLink:String,
+  passwordResetLinkExpiry : Date
 });
 userSchema.methods.comparePassword = async function(userPassword){
   const isMatch = await bcrypt.compare(userPassword, this.password);
@@ -25,6 +27,12 @@ userSchema.methods.generateVerificationLink = function(){
   return token;
 };
 
+userSchema.methods.generatePasswordResetLink = function(){
+  const token =  crypto.randomBytes(32).toString('hex');
+  this.passwordResetLink = crypto.createHash('sha256').update(token).digest('hex');
+  this.passwordResetLinkExpiry = new Date(Date.now() + (60*60*1000));
+  return token;
+};
 
 const User = new mongoose.model("Visitor", userSchema);
 export default User;

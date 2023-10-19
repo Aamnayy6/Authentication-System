@@ -7,4 +7,7 @@ router.post("/register", authMiddleware.checkUniqueEmail,authHandlers.registerUs
 router.post("/login", authMiddleware.checkEmailExists,authHandlers.loginUser);
 router.get("/logout", authMiddleware.checkUserLoggedIn, authHandlers.logout);
 router.get("/verify-email", authHandlers.verifyEmail);
+router.post("/send-reset-password-link", authHandlers.sendResetPasswordLink); //send email to update pass
+router.get("/update-password", authHandlers.verifyPasswordToken);
+router.post("/update-password", authHandlers.updatePassword);
 export default router;

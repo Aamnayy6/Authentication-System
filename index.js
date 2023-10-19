@@ -18,11 +18,12 @@ const Loginlimiter = rateLimit({
   limit: 5, 
   windowMs: 60 * 60 * 1000,
   message: 'Too many attempts, try again in an hour'
-})
+});
+
 
 app.use('/auth/login', Loginlimiter);
 
-app.use(MongooseMorgan({connectionString: process.env.mongoDB_URI}));
+app.use(MongooseMorgan({connectionString: process.env.mongoDB_URI}, {},'short'));
 
 mongoose
   .connect(process.env.mongoDB_URI, {
@@ -44,6 +45,6 @@ app.use("/auth", authRoutes);
 app.use("/", viewRoutes);
 
 
-app.listen(3000, () => {
-  console.log("Listening on port 3000");
+app.listen(process.env.PORT, () => {
+  console.log(`Listening on port ${process.env.PORT}`);
 });

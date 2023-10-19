@@ -124,3 +124,66 @@ export const logout = async (req, res) =>{
 }
 
 };
+
+export const sendResetPasswordLink = async(req, res)=>{
+  try{
+  const email = req.body.email;
+  const user = await User.findOne({email:email});
+  const resetPasswordToken = user.generatePasswordResetLink();
+  await user.save();
+  const mailOptions={
+    recipient:user.email,
+    subject:'Update Password',
+    body: `You have requested a password reset.<br>To change your password click on the link below: <br>
+
+    <a href="http://localhost:3000/auth/update-password?token=${resetPasswordToken}">Update Password</a><br>
+    If you did not request a password change ignore this email.
+    `
+  };
+     await mailHandler(mailOptions);
+
+  return res.send("A reset email has been sent to your account with a link valid for 1 hour.");
+  }catch(err){
+    console.log(err);
+   return res.status(500).send("Error sending email, please try again.");
+  }
+};
+
+export const verifyPasswordToken = async(req, res)=>{
+  try{
+  const passwordResetToken = req.query.token;
+  const tokenHash =  crypto.createHash('sha256').update(passwordResetToken).digest('hex');
+  const user = await User.findOne({passwordResetLink:tokenHash});
+  if(Date.now()>user.passwordResetLinkExpiry){
+    res.status(401).send("Link Expired");
+  }
+  else{
+    return res.render("updatePassword");
+  }
+}catch(err){
+  console.log(err);
+  return res.send("Invalid Link");
+
+}
+};
+
+export const updatePassword = async(req, res)=>{
+  try{
+    const passwordResetToken = req.query.token;
+    const tokenHash =  crypto.createHash('sha256').update(passwordResetToken).digest('hex');
+    const user = await User.findOne({passwordResetLink:tokenHash});
+    if(Date.now()>user.passwordResetLinkExpiry){
+      res.status(401).send("Link Expired");
+    }
+    else{
+      user.password =  bcrypt.hashSync(req.body.password, 10);
+      user.passwordResetLink=undefined;
+      user.passwordResetLinkExpiry=undefined;
+      await user.save();
+      res.send("Password Updated Successfully");
+    }
+  }catch(err){
+    console.log(err);
+    return res.send(err);
+  }
+};
