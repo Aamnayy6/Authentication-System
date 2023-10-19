@@ -30,7 +30,7 @@ userSchema.methods.generateVerificationLink = function(){
 userSchema.methods.generatePasswordResetLink = function(){
   const token =  crypto.randomBytes(32).toString('hex');
   this.passwordResetLink = crypto.createHash('sha256').update(token).digest('hex');
-  this.passwordResetLinkExpiry = new Date(Date.now() + (60*60*1000));
+  this.passwordResetLinkExpiry = new Date(Date.now() + (2*60*60*1000));
   return token;
 };
 

@@ -142,7 +142,7 @@ export const sendResetPasswordLink = async(req, res)=>{
   };
      await mailHandler(mailOptions);
 
-  return res.send("A reset email has been sent to your account with a link valid for 1 hour.");
+  return res.send("A reset email has been sent to your account with a link valid for 2 hours.");
   }catch(err){
     console.log(err);
    return res.status(500).send("Error sending email, please try again.");
