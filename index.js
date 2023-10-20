@@ -1,11 +1,12 @@
 import express from "express";
-import authRoutes from "./Routes/authRoutes.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import viewRoutes from "./Routes/viewRoutes.js";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import MongooseMorgan from "mongoose-morgan";
+import authRoutes from "./Routes/authRoutes.js";
+import viewRoutes from "./Routes/viewRoutes.js";
+import mfaRoutes from "./Routes/mfaRoutes.js"
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -42,6 +43,7 @@ app.get("/", (req, res)=>{
 })
 
 app.use("/auth", authRoutes);
+app.use("/otp/auth", mfaRoutes);
 app.use("/", viewRoutes);
 
 

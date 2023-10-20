@@ -11,7 +11,13 @@ const userSchema = new mongoose.Schema({
   },
   emailVerificationLink:String,
   passwordResetLink:String,
-  passwordResetLinkExpiry : Date
+  passwordResetLinkExpiry : Date,
+  is2faEnabled: {
+    type: Boolean,
+    default: false,
+  },
+  otpAuthUrl: String,
+  otpBase32: String,
 });
 userSchema.methods.comparePassword = async function(userPassword){
   const isMatch = await bcrypt.compare(userPassword, this.password);
