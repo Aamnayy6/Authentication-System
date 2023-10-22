@@ -16,13 +16,14 @@ export const checkUniqueEmail = async (req, res, next) => {
 };
 
 export const checkEmailExists = async(req, res, next) =>{
+
   const {email} = req.body;
   const isExistingEmail = await User.findOne({email:email});
   if(isExistingEmail){
     next();
   }
   else{
-  res.status(400).send("Email not registered");
+  res.status(400).send({message:"Email not registered"});
   return;
 }
 };

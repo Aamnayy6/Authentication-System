@@ -93,7 +93,7 @@ export const loginUser = async (req, res) => {
     const user = await User.findOne({ email: email });
     const isCorrectPassword = await user.comparePassword(password);
     if (!isCorrectPassword) {
-      res.status(401).send("incorrect pass");
+      res.status(401).send({status:"fail",message:"incorrect pass"});
       return;
     }
  
@@ -142,10 +142,10 @@ export const sendResetPasswordLink = async(req, res)=>{
   };
      await mailHandler(mailOptions);
 
-  return res.send("A reset email has been sent to your account with a link valid for 2 hours.");
+  return res.send({message:"A reset email has been sent to your account with a link valid for 2 hours.", status:"success"});
   }catch(err){
     console.log(err);
-   return res.status(500).send("Error sending email, please try again.");
+   return res.status(500).send({message:"Error sending email, please try again.", status:"fail"});
   }
 };
 
@@ -180,7 +180,7 @@ export const updatePassword = async(req, res)=>{
       user.passwordResetLink=undefined;
       user.passwordResetLinkExpiry=undefined;
       await user.save();
-      res.send("Password Updated Successfully");
+      res.send({status:"success",message: "Password Updated Successfully"});
     }
   }catch(err){
     console.log(err);

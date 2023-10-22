@@ -53,7 +53,7 @@ export const verifyOTP = async(req, res)=>{
        }
        user.is2faEnabled = true;
        await user.save();
-       return res.send("2fa setup");
+       return res.send({message:"2fa setup", status:"success"});
     }
     catch(err){
         console.log(err);
@@ -64,6 +64,8 @@ export const validateOTP = async(req, res)=>{
     try{
         const user = await User.findOne({email:req.body.email});
         const token = req.body.token;
+        console.log(req.body.email);
+        console.log(token);
         const totp = new OTPAuth.TOTP({
             issuer: "Google Auth",
             label: "2FA",
@@ -74,9 +76,9 @@ export const validateOTP = async(req, res)=>{
         });
        const delta= totp.validate({token});
        if(delta===null){
-       return res.status(401).send("f");
+       return res.status(401).send({status:"fail"});
        }
-       return res.send("success");
+       return res.send({status:"success"});
     }
     catch(err){
         console.log(err);
