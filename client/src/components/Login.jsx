@@ -27,7 +27,7 @@ function Login(){
     const response = await fetch('/auth/login', { method: "POST",  headers: {
       "Content-Type": "application/json",
     }, body: JSON.stringify(formJson) });
-    const result = await response.json();
+   const result = await response.json();
     if(result.data.user.is2faEnabled===true){
       navigate("/validate-otp");
     }
@@ -43,7 +43,6 @@ function Login(){
         link={{ url: "/forgot-password", label: "Forgot Password?" }}
         submit = {submitLogin}
         />
-
         );
 };
 export default Login;
